@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Configuração para iFrame: Ocupa tudo com respiro */
+    body { 
+      font-family: 'Montserrat', sans-serif; 
+      background: transparent; 
+      color: #333; 
+      padding: 10px; 
+      margin: 0;
+    }
+    
+    .main-card { 
+      background: #fff; 
+      border: 1px solid #f2f2f2; 
+      border-radius: 20px; 
+      padding: 50px; /* Mais respiro interno */
+      width: 100%; /* Ocupa 100% do iFrame */
+      max-width: 1000px; /* Limite máximo para não esticar infinito em telas UltraWide */
+      margin: auto; 
+      box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+    }
+
+    .form-label { 
+      font-size: 0.9rem; 
+      text-transform: uppercase; 
+      letter-spacing: 3px; 
+      color: #bbb; 
+      margin-bottom: 12px; 
+      display: block; 
+      font-weight: 400;
+    }
+    
+    .form-control, .form-select { 
+      border: 1px solid #f8f8f8; 
+      background: #fafafa; 
+      border-radius: 10px; 
+      padding: 18px; /* Inputs bem robustos */
+      font-size: 1.1rem; 
+      margin-bottom: 25px; 
+      color: #444; 
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      background: #fff;
+      border-color: #ddd;
+      box-shadow: none;
+    }
+
+    /* Grid de 4 Botões Grandes */
+    .btn-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 15px; 
+      margin-top: 10px; 
+    }
+    
+    .action-btn { 
+      background: #333; 
+      color: #fff; 
+      border: none; 
+      border-radius: 10px; 
+      padding: 22px; /* Botões altos e fáceis de clicar */
+      font-size: 0.9rem; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+      width: 100%; 
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .btn-grey { background: #7a7a7a; }
+    .action-btn:hover { opacity: 0.8; transform: translateY(-2px); }
+    
+    .btn-copy { 
+      background: #f4e1d2; 
+      color: #8d7b6d; 
+      margin-top: 35px; 
+      width: 100%; 
+      border: none; 
+      border-radius: 10px; 
+      padding: 20px; 
+      font-size: 1rem; 
+      text-transform: uppercase; 
+      display: none; 
+      font-weight: 500; 
+      letter-spacing: 2px;
+    }
+    
+    #loader { display: none; font-size: 1rem; color: #ccc; text-align: center; margin: 30px; font-style: italic; }
+    
+    #resultado { 
+      display: none; 
+      margin-top: 40px; 
+      border-top: 1px solid #f5f5f5; 
+      padding-top: 40px; 
+    }
+    
+    .stat-val { 
+      font-family: 'Cormorant Garamond', serif; 
+      font-size: 3.5rem; /* Números em destaque */
+      display: block; 
+      color: #222; 
+      line-height: 1; 
+      margin-bottom: 5px;
+    }
+    
+    .stat-label { 
+      font-size: 0.8rem; 
+      color: #bbb; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+    }
+    
+    .list-title { 
+      font-size: 0.9rem; 
+      text-transform: uppercase; 
+      letter-spacing: 4px; 
+      color: #d4a5a5; 
+      margin: 40px 0 20px 0; 
+      border-bottom: 1px solid #fafafa; 
+      padding-bottom: 10px;
+    }
+    
+    .table-gs { width: 100%; font-size: 1.1rem; color: #555; margin-bottom: 20px; }
+    .table-gs td { padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
+    .text-future { color: #8a9a8a; }
+
+    /* Ajuste para telas menores dentro do iFrame */
+    @media (max-width: 480px) {
+      .main-card { padding: 25px; }
+      .stat-val { font-size: 2.5rem; }
+      .btn-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-card">
+    <label class="form-label">Nome do Aluno(a)</label>
+    <input type="text" id="aluno" class="form-control" placeholder="Digite para buscar...">
+
+    <div class="row g-3">
+      <div class="col-6">
+        <label class="form-label">Plano</label>
+        <select id="plano" class="form-select">
+          <option value="5 AULAS">5 Aulas</option>
+          <option value="12 AULAS">12 Aulas</option>
+          <option value="6 MESES">6 Meses</option>
+          <option value="12 MESES">12 Meses</option>
+          <option value="MENSALIDADE">Mensalidade</option>
+        </select>
+      </div>
+      <div class="col-6">
+        <label class="form-label">Frequência</label>
+        <select id="freq" class="form-select">
+          <option value="1">1x p/ Semana</option>
+          <option value="2">2x p/ Semana</option>
+          <option value="3">3x p/ Semana</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-grid">
+      <button onclick="executar('add')" class="action-btn btn-grey">Novo Aluno</button>
+      <button onclick="executar('renew')" class="action-btn btn-grey">Renovar</button>
+      <button onclick="consultar('hist')" class="action-btn">Histórico</button>
+      <button onclick="consultar('agenda')" class="action-btn">Agendas</button>
+    </div>
+
+    <div id="loader">
+       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+       Sincronizando com a base de dados...
+    </div>
+
+    <div id="resultado">
+      <div class="row g-4 text-center mb-5">
+        <div class="col-6">
+          <div>
+            <span class="stat-val" id="res-restantes" style="color:#d4a5a5">0</span>
+            <span class="stat-label">Restantes</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div>
+            <span class="stat-val" id="res-feitas">0</span>
+            <span class="stat-label">Realizadas</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="lista-container">
+        <div class="list-title" id="titulo-dinamico">Eventos Recentes</div>
+        <table class="table-gs"><tbody id="corpo-tabela"></tbody></table>
+      </div>
+
+      <button id="btnCopiar" onclick="copiarWhats()" class="btn-copy">Copiar para WhatsApp 📋</button>
+    </div>
+  </div>
+
+<script>
+  let dadosParaCopiar = "";
+
+  function consultar(tipo) {
+    const nome = document.getElementById("aluno").value;
+    if(!nome) return alert("Por favor, digite o nome do aluno.");
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("resultado").style.display = "none";
+
+    google.script.run.withSuccessHandler(function(res) {
+      if(res.erro) { 
+        document.getElementById("loader").style.display = "none"; 
+        return alert(res.erro); 
+      }
+      
+      if(tipo === 'agenda') {
+        google.script.run.withSuccessHandler(function(futuros) {
+          exibirDados(res, futuros, 'agenda');
+        }).APP_verEventosFuturos(nome);
+      } else {
+        exibirDados(res, null, 'hist');
+      }
+    }).APP_verHistoricoAulas(nome);
+  }
+
+  function exibirDados(res, futuros, tipo) {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("resultado").style.display = "block";
+    document.getElementById("btnCopiar").style.display = "block";
+    document.getElementById("res-restantes").innerText = res.resumo.restantes;
+    document.getElementById("res-feitas").innerText = res.resumo.feitas;
+
+    let tabela = document.getElementById("corpo-tabela");
+    let titulo = document.getElementById("titulo-dinamico");
+    let textoWhats = `*RELATÓRIO - GS STUDIO*\n*Aluno:* ${res.resumo.nome}\n*Saldo:* ${res.resumo.restantes} aulas\n\n`;
+
+    if(tipo === 'hist') {
+      titulo.innerText = "Histórico de Presenças (Check ✅)";
+      titulo.style.color = "#d4a5a5";
+      tabela.innerHTML = res.aulasFeitas.map(a => `<tr><td>${a.data}</td><td class="text-end">${a.hora}</td></tr>`).join('') || "<tr><td colspan='2' class='text-center opacity-50'>Nenhuma aula registrada neste plano.</td></tr>";
+      textoWhats += `*AULAS REALIZADAS:*\n` + res.aulasFeitas.map(a => `• ${a.data} às ${a.hora}`).join('\n');
+    } else {
+      titulo.innerText = "Próximos Agendamentos";
+      titulo.style.color = "#8a9a8a";
+      tabela.innerHTML = futuros.eventos.map(e => `<tr class="text-future"><td>${e.data}</td><td class="text-end">${e.hora}</td></tr>`).join('') || "<tr><td colspan='2' class='text-center opacity-50'>Sem horários marcados para os próximos dias.</td></tr>";
+      textoWhats += `*PRÓXIMOS AGENDAMENTOS:*\n` + futuros.eventos.map(e => `• ${e.data} às ${e.hora}`).join('\n');
+    }
+    
+    dadosParaCopiar = textoWhats + `\n\n_Giulia Schifino Studio_`;
+  }
+
+  function copiarWhats() {
+    navigator.clipboard.writeText(dadosParaCopiar).then(() => {
+        const btn = document.getElementById("btnCopiar");
+        btn.innerText = "Copiado com sucesso! ✅";
+        setTimeout(() => { btn.innerText = "Copiar para WhatsApp 📋"; }, 2000);
+    });
+  }
+
+  function executar(acao) {
+    const nome = document.getElementById("aluno").value;
+    const plano = document.getElementById("plano").value;
+    const freq = document.getElementById("freq").value;
+    if(!nome) return alert("Digite o nome para prosseguir.");
+    
+    document.getElementById("loader").style.display = "block";
+    const func = (acao === 'add') ? 'CONTRATOS_adicionarDaAgenda' : 'CONTRATOS_renovacaoManual';
+    
+    google.script.run.withSuccessHandler(msg => { 
+      document.getElementById("loader").style.display = "none";
+      alert(msg); 
+      consultar('hist'); 
+    }).withFailureHandler(err => {
+      document.getElementById("loader").style.display = "none";
+      alert("Erro: " + err);
+    })[func](nome, plano, freq);
+  }
+</script>
+</body>
+</html>
