@@ -55,6 +55,7 @@ function CONTRATOS_adicionarDaAgenda(nomeDoAluno, planoEscolhido, freqEscolhida)
     sh.getRange(lastRow, 12).setValue("ativo");      // L
     sh.getRange(lastRow, 28).setValue(restantes);   // AB
     sh.getRange(lastRow, 30).setValue(aulasFeitas);  // AD
+    if (restantes !== "") _gs_atualizarDataZerou(sh, lastRow, restantes); // AC
 
     return "✅ " + nomeDoAluno.toUpperCase() + " ADICIONADO!";
   } catch (e) { return "❌ Erro ao adicionar: " + e.toString(); }
@@ -90,13 +91,14 @@ function CONTRATOS_renovacaoManual(nomeDoAluno, planoEscolhido, freqEscolhida) {
     const aulasFeitas = 1; 
     const restantes = (contratadas !== "") ? contratadas - aulasFeitas : "";
 
-    sh.getRange(linha, 2).setValue(hoje);          
-    sh.getRange(linha, 5).setValue(plano);         
-    sh.getRange(linha, 6).setValue(freq);          
-    sh.getRange(linha, 11).setValue(contratadas);  
-    sh.getRange(linha, 12).setValue("ativo");      
-    sh.getRange(linha, 28).setValue(restantes);    
-    sh.getRange(linha, 30).setValue(aulasFeitas);  
+    sh.getRange(linha, 2).setValue(hoje);
+    sh.getRange(linha, 5).setValue(plano);
+    sh.getRange(linha, 6).setValue(freq);
+    sh.getRange(linha, 11).setValue(contratadas);
+    sh.getRange(linha, 12).setValue("ativo");
+    sh.getRange(linha, 28).setValue(restantes);
+    sh.getRange(linha, 30).setValue(aulasFeitas);
+    if (restantes !== "") _gs_atualizarDataZerou(sh, linha, restantes); // AC
 
     return "🔄 RENOVAÇÃO OK: " + nomeDoAluno.toUpperCase();
   } catch (e) { return "❌ Erro na renovação: " + e.toString(); }
@@ -153,15 +155,17 @@ function APP_verHistoricoAulas(nomeDoAluno) {
 
     for (let i = 1; i < dataC.length; i++) {
       let nomePlanilha = String(dataC[i][3] || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (nomePlanilha.includes(busca)) { 
+      if (nomePlanilha.includes(busca)) {
         dataInicioPlano = dataC[i][1]; // Coluna B (Data de Início)
+        const dataZerouRaw = dataC[i][28]; // Coluna AC (Data em que zerou as aulas)
         dadosAluno = {
           nome: dataC[i][3],
           plano: dataC[i][4],
           restantes: dataC[i][27] || 0,
           feitas: dataC[i][29] || 0,
           status: String(dataC[i][11]).toUpperCase(),
-          inicio: Utilities.formatDate(new Date(dataInicioPlano), "GMT-3", "dd/MM/yy")
+          inicio: Utilities.formatDate(new Date(dataInicioPlano), "GMT-3", "dd/MM/yy"),
+          dataZerou: dataZerouRaw ? Utilities.formatDate(new Date(dataZerouRaw), "GMT-3", "dd/MM/yyyy") : null
         };
         break;
       }
@@ -188,5 +192,63 @@ function APP_verHistoricoAulas(nomeDoAluno) {
     });
 
     return { resumo: dadosAluno, aulasFeitas: historicoAgenda };
+  } catch (e) { return { erro: e.toString() }; }
+}
+
+/**
+ * BUSCA AULAS COM CHECK EM UM PERÍODO ESPECÍFICO (Web App)
+ */
+function APP_aulasNoPeriodo(nomeDoAluno, dataInicioStr, dataFimStr) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sh = ss.getSheetByName("Contratos");
+    const dataC = sh.getDataRange().getValues();
+    const busca = nomeDoAluno.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    let dadosAluno = null;
+    for (let i = 1; i < dataC.length; i++) {
+      let nomePlanilha = String(dataC[i][3] || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (nomePlanilha.includes(busca)) {
+        const dataZerouRaw = dataC[i][28]; // Coluna AC (Data em que zerou as aulas)
+        dadosAluno = {
+          nome: dataC[i][3],
+          plano: dataC[i][4],
+          restantes: dataC[i][27] || 0,
+          feitas: dataC[i][29] || 0,
+          status: String(dataC[i][11]).toUpperCase(),
+          dataZerou: dataZerouRaw ? Utilities.formatDate(new Date(dataZerouRaw), "GMT-3", "dd/MM/yyyy") : null
+        };
+        break;
+      }
+    }
+
+    if (!dadosAluno) return { erro: "Aluno não encontrado." };
+
+    const dataInicio = new Date(dataInicioStr + "T00:00:00");
+    const dataFim = new Date(dataFimStr + "T23:59:59");
+    if (isNaN(dataInicio) || isNaN(dataFim) || dataInicio > dataFim) {
+      return { erro: "Período inválido. Confira as datas." };
+    }
+
+    const agenda = CalendarApp.getDefaultCalendar();
+    const eventos = agenda.getEvents(dataInicio, dataFim);
+    const regexBusca = new RegExp("\\b" + busca + "\\b", "i");
+    const checkPat = /✅|✔|☑|✓/;
+    let aulasNoPeriodo = [];
+
+    eventos.forEach(e => {
+      let tit = e.getTitle();
+      let titNorm = tit.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (regexBusca.test(titNorm) && checkPat.test(tit)) {
+        aulasNoPeriodo.push({
+          data: Utilities.formatDate(e.getStartTime(), "GMT-3", "dd/MM"),
+          hora: Utilities.formatDate(e.getStartTime(), "GMT-3", "HH:mm")
+        });
+      }
+    });
+
+    const periodo = Utilities.formatDate(dataInicio, "GMT-3", "dd/MM/yy") + " a " + Utilities.formatDate(dataFim, "GMT-3", "dd/MM/yy");
+
+    return { resumo: dadosAluno, aulasFeitas: aulasNoPeriodo, periodo: periodo };
   } catch (e) { return { erro: e.toString() }; }
 }

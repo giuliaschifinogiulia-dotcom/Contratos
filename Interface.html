@@ -3,139 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    /* Configuração para iFrame: Ocupa tudo com respiro */
-    body { 
-      font-family: 'Montserrat', sans-serif; 
-      background: transparent; 
-      color: #333; 
-      padding: 10px; 
-      margin: 0;
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500;600&family=Montserrat:wght@300;400;500;600&display=swap');
+
+    :root {
+      --rose: #cf9d98;
+      --rose-soft: #f5e5e3;
+      --sand: #f6e8dc;
+      --ink: #2f2b29;
+      --ink-soft: #4a4441;
+      --muted: #ada49f;
+      --bg: #faf7f5;
+      --surface: #ffffff;
+      --shadow-card: 0 1px 2px rgba(47,43,41,0.03), 0 28px 64px -22px rgba(47,43,41,0.18);
+      --shadow-btn: 0 12px 28px -10px rgba(47,43,41,0.35);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --r-lg: 24px;
+      --r-md: 14px;
     }
-    
-    .main-card { 
-      background: #fff; 
-      border: 1px solid #f2f2f2; 
-      border-radius: 20px; 
-      padding: 50px; /* Mais respiro interno */
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: transparent;
+      color: var(--ink);
+      padding: 12px;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .main-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fdfbfa 100%);
+      border: 1px solid rgba(207,157,152,0.14);
+      border-radius: var(--r-lg);
+      padding: 48px; /* Mais respiro interno */
       width: 100%; /* Ocupa 100% do iFrame */
       max-width: 1000px; /* Limite máximo para não esticar infinito em telas UltraWide */
-      margin: auto; 
-      box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+      margin: auto;
+      box-shadow: var(--shadow-card);
     }
 
-    .form-label { 
-      font-size: 0.9rem; 
-      text-transform: uppercase; 
-      letter-spacing: 3px; 
-      color: #bbb; 
-      margin-bottom: 12px; 
-      display: block; 
-      font-weight: 400;
-    }
-    
-    .form-control, .form-select { 
-      border: 1px solid #f8f8f8; 
-      background: #fafafa; 
-      border-radius: 10px; 
-      padding: 18px; /* Inputs bem robustos */
-      font-size: 1.1rem; 
-      margin-bottom: 25px; 
-      color: #444; 
-      transition: all 0.3s;
-    }
-    
-    .form-control:focus {
-      background: #fff;
-      border-color: #ddd;
-      box-shadow: none;
-    }
-
-    /* Grid de 4 Botões Grandes */
-    .btn-grid { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 15px; 
-      margin-top: 10px; 
-    }
-    
-    .action-btn { 
-      background: #333; 
-      color: #fff; 
-      border: none; 
-      border-radius: 10px; 
-      padding: 22px; /* Botões altos e fáceis de clicar */
-      font-size: 0.9rem; 
-      text-transform: uppercase; 
-      letter-spacing: 2px; 
-      width: 100%; 
+    .form-label {
+      font-size: 0.78rem;
       font-weight: 500;
-      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: block;
     }
-    
-    .btn-grey { background: #7a7a7a; }
-    .action-btn:hover { opacity: 0.8; transform: translateY(-2px); }
-    
-    .btn-copy { 
-      background: #f4e1d2; 
-      color: #8d7b6d; 
-      margin-top: 35px; 
-      width: 100%; 
-      border: none; 
-      border-radius: 10px; 
-      padding: 20px; 
-      font-size: 1rem; 
-      text-transform: uppercase; 
-      display: none; 
-      font-weight: 500; 
+
+    .form-control, .form-select {
+      border: 1.5px solid transparent;
+      background: var(--bg);
+      border-radius: var(--r-md);
+      padding: 17px 18px; /* Inputs bem robustos */
+      font-size: 1.05rem;
+      margin-bottom: 22px;
+      color: var(--ink);
+      transition: border-color .25s var(--ease), box-shadow .25s var(--ease), background-color .25s var(--ease);
+    }
+
+    .form-control:focus, .form-select:focus {
+      background: var(--surface);
+      border-color: var(--rose);
+      box-shadow: 0 0 0 4px rgba(207,157,152,0.18);
+      outline: none;
+    }
+
+    /* Grid de Botões Grandes */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .action-btn {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: var(--r-md);
+      padding: 21px; /* Botões altos e fáceis de clicar */
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      width: 100%;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      transition: transform .2s var(--ease), box-shadow .2s var(--ease), background-color .25s var(--ease);
+    }
+
+    .action-btn:hover { background: var(--ink-soft); box-shadow: 0 16px 36px -10px rgba(47,43,41,0.42); transform: translateY(-2px); }
+    .action-btn:active { transform: translateY(0) scale(0.97); }
+    .action-btn:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
+
+    .btn-grey {
+      background: var(--surface);
+      color: var(--ink-soft);
+      border: 1.5px solid #ece4e1;
+      box-shadow: 0 10px 26px -14px rgba(47,43,41,0.2);
+    }
+    .btn-grey:hover { background: var(--rose-soft); border-color: var(--rose-soft); color: var(--ink); box-shadow: 0 14px 30px -12px rgba(207,157,152,0.4); }
+
+    .btn-copy {
+      background: var(--sand);
+      color: #8d7263;
+      margin-top: 32px;
+      width: 100%;
+      border: none;
+      border-radius: var(--r-md);
+      padding: 19px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      display: none;
+      font-weight: 500;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: background-color .25s var(--ease), transform .2s var(--ease);
+    }
+    .btn-copy:hover { background: #f1ddcb; }
+    .btn-copy:active { transform: scale(0.98); }
+
+    #loader {
+      display: none;
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-align: center;
+      margin: 32px 0 6px;
+      font-style: italic;
+      letter-spacing: .3px;
+    }
+
+    #resultado {
+      display: none;
+      margin-top: 36px;
+      border-top: 1px solid #f4ede9;
+      padding-top: 36px;
+      animation: rise .45s var(--ease);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.4rem; /* Números em destaque */
+      font-weight: 500;
+      display: block;
+      line-height: 1;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--ink) 35%, var(--rose) 140%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
       letter-spacing: 2px;
     }
-    
-    #loader { display: none; font-size: 1rem; color: #ccc; text-align: center; margin: 30px; font-style: italic; }
-    
-    #resultado { 
-      display: none; 
-      margin-top: 40px; 
-      border-top: 1px solid #f5f5f5; 
-      padding-top: 40px; 
+
+    .list-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3.5px;
+      color: var(--rose);
+      margin: 36px 0 18px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f6efec;
     }
-    
-    .stat-val { 
-      font-family: 'Cormorant Garamond', serif; 
-      font-size: 3.5rem; /* Números em destaque */
-      display: block; 
-      color: #222; 
-      line-height: 1; 
-      margin-bottom: 5px;
-    }
-    
-    .stat-label { 
-      font-size: 0.8rem; 
-      color: #bbb; 
-      text-transform: uppercase; 
-      letter-spacing: 2px; 
-    }
-    
-    .list-title { 
-      font-size: 0.9rem; 
-      text-transform: uppercase; 
-      letter-spacing: 4px; 
-      color: #d4a5a5; 
-      margin: 40px 0 20px 0; 
-      border-bottom: 1px solid #fafafa; 
-      padding-bottom: 10px;
-    }
-    
-    .table-gs { width: 100%; font-size: 1.1rem; color: #555; margin-bottom: 20px; }
-    .table-gs td { padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
+
+    .table-gs { width: 100%; font-size: 1.05rem; color: var(--ink-soft); margin-bottom: 16px; border-collapse: collapse; }
+    .table-gs td { padding: 14px 6px; border-bottom: 1px solid #f7f1ee; transition: background-color .2s var(--ease); }
+    .table-gs tr:last-child td { border-bottom: none; }
+    .table-gs tr:hover td { background: var(--bg); }
     .text-future { color: #8a9a8a; }
 
     /* Ajuste para telas menores dentro do iFrame */
     @media (max-width: 480px) {
-      .main-card { padding: 25px; }
+      .main-card { padding: 26px; border-radius: 20px; }
       .stat-val { font-size: 2.5rem; }
       .btn-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -173,6 +234,18 @@
       <button onclick="consultar('agenda')" class="action-btn">Agendas</button>
     </div>
 
+    <div class="row g-3 mt-1">
+      <div class="col-6">
+        <label class="form-label">Período - De</label>
+        <input type="date" id="dataInicio" class="form-control">
+      </div>
+      <div class="col-6">
+        <label class="form-label">Período - Até</label>
+        <input type="date" id="dataFim" class="form-control">
+      </div>
+    </div>
+    <button onclick="consultar('periodo')" class="action-btn" style="width:100%; margin-top:-10px;">Aulas no Período</button>
+
     <div id="loader">
        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
        Sincronizando com a base de dados...
@@ -184,6 +257,7 @@
           <div>
             <span class="stat-val" id="res-restantes" style="color:#d4a5a5">0</span>
             <span class="stat-label">Restantes</span>
+            <span class="stat-label" id="res-data-zerou" style="display:none; color:#c0392b; margin-top:6px;"></span>
           </div>
         </div>
         <div class="col-6">
@@ -209,15 +283,35 @@
   function consultar(tipo) {
     const nome = document.getElementById("aluno").value;
     if(!nome) return alert("Por favor, digite o nome do aluno.");
+
+    if(tipo === 'periodo') {
+      const di = document.getElementById("dataInicio").value;
+      const df = document.getElementById("dataFim").value;
+      if(!di || !df) return alert("Selecione o período (data inicial e final).");
+
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("resultado").style.display = "none";
+
+      google.script.run.withSuccessHandler(function(res) {
+        document.getElementById("loader").style.display = "none";
+        if(res.erro) return alert(res.erro);
+        exibirDados(res, null, 'periodo');
+      }).withFailureHandler(function(err) {
+        document.getElementById("loader").style.display = "none";
+        alert("Erro: " + err);
+      }).APP_aulasNoPeriodo(nome, di, df);
+      return;
+    }
+
     document.getElementById("loader").style.display = "block";
     document.getElementById("resultado").style.display = "none";
 
     google.script.run.withSuccessHandler(function(res) {
-      if(res.erro) { 
-        document.getElementById("loader").style.display = "none"; 
-        return alert(res.erro); 
+      if(res.erro) {
+        document.getElementById("loader").style.display = "none";
+        return alert(res.erro);
       }
-      
+
       if(tipo === 'agenda') {
         google.script.run.withSuccessHandler(function(futuros) {
           exibirDados(res, futuros, 'agenda');
@@ -235,15 +329,29 @@
     document.getElementById("res-restantes").innerText = res.resumo.restantes;
     document.getElementById("res-feitas").innerText = res.resumo.feitas;
 
+    const elDataZerou = document.getElementById("res-data-zerou");
+    if (res.resumo.restantes <= 0 && res.resumo.dataZerou) {
+      elDataZerou.innerText = "Zerou em " + res.resumo.dataZerou;
+      elDataZerou.style.display = "block";
+    } else {
+      elDataZerou.style.display = "none";
+    }
+
     let tabela = document.getElementById("corpo-tabela");
     let titulo = document.getElementById("titulo-dinamico");
-    let textoWhats = `*RELATÓRIO - GS STUDIO*\n*Aluno:* ${res.resumo.nome}\n*Saldo:* ${res.resumo.restantes} aulas\n\n`;
+    let textoWhats = `*RELATÓRIO - GS STUDIO*\n*Aluno:* ${res.resumo.nome}\n*Saldo:* ${res.resumo.restantes} aulas` +
+      (res.resumo.restantes <= 0 && res.resumo.dataZerou ? ` (zerou em ${res.resumo.dataZerou})` : "") + `\n\n`;
 
     if(tipo === 'hist') {
       titulo.innerText = "Histórico de Presenças (Check ✅)";
       titulo.style.color = "#d4a5a5";
       tabela.innerHTML = res.aulasFeitas.map(a => `<tr><td>${a.data}</td><td class="text-end">${a.hora}</td></tr>`).join('') || "<tr><td colspan='2' class='text-center opacity-50'>Nenhuma aula registrada neste plano.</td></tr>";
       textoWhats += `*AULAS REALIZADAS:*\n` + res.aulasFeitas.map(a => `• ${a.data} às ${a.hora}`).join('\n');
+    } else if(tipo === 'periodo') {
+      titulo.innerText = `Aulas no Período (${res.periodo})`;
+      titulo.style.color = "#d4a5a5";
+      tabela.innerHTML = res.aulasFeitas.map(a => `<tr><td>${a.data}</td><td class="text-end">${a.hora}</td></tr>`).join('') || "<tr><td colspan='2' class='text-center opacity-50'>Nenhuma aula com check encontrada nesse período.</td></tr>";
+      textoWhats += `*AULAS NO PERÍODO (${res.periodo}):*\n` + (res.aulasFeitas.map(a => `• ${a.data} às ${a.hora}`).join('\n') || "Nenhuma aula encontrada.");
     } else {
       titulo.innerText = "Próximos Agendamentos";
       titulo.style.color = "#8a9a8a";

@@ -90,9 +90,10 @@ function atualizarPlanos_BRUTO() {
       let restantes = contratadas - totalFeitas;
 
       // 1. Atualiza a Planilha
-      sheet.getRange(i + 1, COL_FEITAS_AD + 1).setValue(totalFeitas); 
+      sheet.getRange(i + 1, COL_FEITAS_AD + 1).setValue(totalFeitas);
       sheet.getRange(i + 1, COL_RESTANTES + 1).setValue(restantes);
       sheet.getRange(i + 1, COL_RESTANTES + 1).setBackground(restantes <= 0 ? "#ea9999" : "#cfe2f3");
+      _gs_atualizarDataZerou(sheet, i + 1, restantes);
 
       // 2. 🚀 CRIAÇÃO DA TASK (Se faltar 2 aulas ou menos)
       if (restantes <= 2 && restantes > -5) { // -5 para não criar task de contratos muito antigos/vencidos
@@ -187,6 +188,7 @@ function atualizar_MENSALISTAS_Agenda_Saldo() {
         sheet.getRange(i + 1, COL_RESTANTES + 1).setValue(saldoMes);
         sheet.getRange(i + 1, COL_RESTANTES + 1).setBackground(saldoMes <= 0 ? "#ea9999" : "#cfe2f3");
         sheet.getRange(i + 1, COL_RECUPERACAO + 1).setValue(novoSaldoRec);
+        _gs_atualizarDataZerou(sheet, i + 1, saldoMes);
       }
     }
   }
@@ -313,6 +315,7 @@ function CONTRATOS_renovacaoManual() {
   // Limpa progresso para o novo ciclo
   sh.getRange(linha, 28).setValue(aulasContratadas);   // AB: SALDO (Inicia cheio)
   sh.getRange(linha, 30).setValue(0);                  // AD: FEITAS (Zera)
+  _gs_atualizarDataZerou(sh, linha, aulasContratadas); // AC: limpa data de zerado
   
   // 5. FEEDBACK FINAL NO MONITOR
   let msgFinal = "✅ RENOVAÇÃO CONCLUÍDA!\n\n" +
@@ -869,6 +872,23 @@ function gs_escreverNoMonitor(texto) {
   sh.getRange("D4:H15").clearContent();
   sh.getRange("D4").setValue(texto);
 }
+
+/**
+ * REGISTRA A DATA EM QUE O ALUNO ZEROU AS AULAS (Coluna AC, ao lado do Saldo em AB)
+ * Grava a data apenas na primeira vez que zera (não fica reescrevendo a cada sync).
+ * Quando o saldo volta a ficar positivo (renovação), limpa a data.
+ */
+const COL_DATA_ZEROU = 29; // AC (1-indexed)
+function _gs_atualizarDataZerou(sheet, linha, restantes) {
+  const celula = sheet.getRange(linha, COL_DATA_ZEROU);
+  if (Number(restantes) <= 0) {
+    if (!celula.getValue()) {
+      celula.setValue(new Date()).setNumberFormat("dd/MM/yyyy");
+    }
+  } else {
+    celula.clearContent();
+  }
+}
 /**
  * FUNÇÃO PARA CRIAR TASK COM LINK MÁGICO
  * Mapeamento: D (Nome), E (Serviço), AL (Telefone)
@@ -1169,12 +1189,14 @@ function GS_MOTOR_BUSCA_TUDO(nomeBusca) {
       let nomeC = _gs_limparNomeComparacao(data[i][2]); // Coluna C
       let nomeD = _gs_limparNomeComparacao(data[i][3]); // Coluna D
       if (nomeC.includes(buscaLimpa) || nomeD.includes(buscaLimpa)) {
+        const dataZerouRaw = data[i][28]; // Coluna AC (Data em que zerou as aulas)
         alunoData = {
           nome: data[i][2],
           plano: data[i][4],
           restantes: data[i][27] || 0,
           feitas: data[i][29] || 0,
-          status: data[i][11]
+          status: data[i][11],
+          dataZerou: dataZerouRaw ? Utilities.formatDate(new Date(dataZerouRaw), "GMT-3", "dd/MM/yyyy") : null
         };
         break;
       }
